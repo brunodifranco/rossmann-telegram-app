@@ -35,7 +35,7 @@ def load_dataset(store_id):
         df_test = df_test.drop('Id', axis=1 )
 
         # Convert to json
-        data = json.dumps( df_test.to_dict(orient='records'))    
+        data = json.dumps(df_test.to_dict(orient='records'))    
     else:
         data = 'error'         
     return data
