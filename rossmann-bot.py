@@ -70,7 +70,8 @@ app = Flask(__name__)
 
 def index():
     if request.method == 'POST':
-        message = request.get_json()        
+        message = request.get_json()
+                
         chat_id, store_id = parse_message(message)
         
         if store_id != 'error':
@@ -90,10 +91,14 @@ def index():
                 send_message(chat_id, msg)
                 return Response('Ok', status=200)   
             
+            else:
+                send_message(chat_id, 'Store not available')    
+                return Response('Ok', status=200)
+            
         else:
-            send_message(chat_id, 'Store not available')    
+            send_message(chat_id, 'Please enter a valid Store ID')    
             return Response('Ok', status=200)
-        
+                    
     else:
         return '<h1> Rossmann Telegram Bot </h1>'   # bot html header 
  
