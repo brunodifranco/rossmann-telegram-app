@@ -8,9 +8,8 @@ import os
 #bot-token
 TOKEN = '5641286371:AAGkJr5q8TFDLnEeEGl1YMnOWRu7I4-4-2k'
 
-# https://api.telegram.org/bot5641286371:AAGkJr5q8TFDLnEeEGl1YMnOWRu7I4-4-2k/getMe
-# https://api.telegram.org/bot5641286371:AAGkJr5q8TFDLnEeEGl1YMnOWRu7I4-4-2k/getUpdates
-# https://api.telegram.org/bot5641286371:AAGkJr5q8TFDLnEeEGl1YMnOWRu7I4-4-2k/setWebhook?url=https://3e00ef5601902a.lhr.life
+# Webhook was set
+# https://api.telegram.org/bot5641286371:AAGkJr5q8TFDLnEeEGl1YMnOWRu7I4-4-2k/setWebhook?url=https://rossmann-telegram-app.onrender.com
 
 def send_message(chat_id, text):    
     url  = f'https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}' # adding TOKEN and chat_id to url
@@ -38,27 +37,26 @@ def load_dataset(store_id):
         # Convert to json
         data = json.dumps( df_test.to_dict(orient='records'))    
     else:
-        data = 'error'      
-        
+        data = 'error'         
     return data
 
 def predict(data):
     # API CALL
-    url = 'https://rossmann-app.onrender.com/rossmann/predict'
+    url = 'https://rossmann-app.onrender.com/rossmann/predict' 
     header = {'Content-type': 'application/json'}
     data = data
 
     r = requests.post(url, data=data, headers=header)
     print(f'Status Code {r.status_code}')
-
+   
     d1 = pd.DataFrame(r.json(), columns=r.json()[0].keys())
-    return d1
+    return d1 # predicts and return a df
 
 def parse_message(message):
-    chat_id = message['message']['chat']['id']
-    store_id = message['message']['text']
+    chat_id = message['message']['chat']['id'] # getting the chat_id
+    store_id = message['message']['text'] # getting the text message
         
-    store_id = store_id.replace('/', '')
+    store_id = store_id.replace('/', '') # telegram requires '/' (e.g. /22, to choose store 22), hence the replacement
     
     try:
         store_id = int(store_id)
@@ -72,8 +70,7 @@ app = Flask(__name__)
 
 def index():
     if request.method == 'POST':
-        message = request.get_json()
-        
+        message = request.get_json()        
         chat_id, store_id = parse_message(message)
         
         if store_id != 'error':
@@ -91,24 +88,15 @@ def index():
                 msg = 'Store number {} will sell €{:,.2f} in the next 6 weeks'.format(d2['store'].values[0], d2['prediction'].values[0])
 
                 send_message(chat_id, msg)
-                return Response('Ok', status=200)
+                return Response('Ok', status=200)   
             
         else:
             send_message(chat_id, 'Store not available')    
             return Response('Ok', status=200)
         
     else:
-        return '<h1> Rossmann Telegram Bot </h1>'    
+        return '<h1> Rossmann Telegram Bot </h1>'   # bot html header 
  
 if __name__ == '__main__':
     port = os.environ.get('PORT', 5000)
     app.run(host='0.0.0.0', port=port)
-
-
-
-
-
-
-
-
-    
